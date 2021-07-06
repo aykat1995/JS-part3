@@ -1,5 +1,7 @@
 window.addEventListener('DOMContentLoaded', function() {
 
+   //Табы
+
    let tab = document.querySelectorAll('.info-header-tab'),
       info = document.querySelector('.info-header'),
       tabContent = document.querySelectorAll('.info-tabcontent');
@@ -33,6 +35,8 @@ window.addEventListener('DOMContentLoaded', function() {
          }
       }
    });
+
+   //Таймер
 
    let deadline = '2021-06-28';
 
