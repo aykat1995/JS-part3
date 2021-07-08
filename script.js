@@ -38,7 +38,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
    //Таймер
 
-   let deadline = '2021-06-28';
+   let deadline = '2021-07-28';
 
    function getTimeEnding(endtime) {
 
@@ -113,5 +113,57 @@ window.addEventListener('DOMContentLoaded', function() {
       more.classList.remove('more-splash');
       document.body.style.overflow = '';
    }
+
+
+   // Отправка форм
+
+   let message = {
+      loading: 'Идет загрузка',
+      success: 'Ваши данные отправлены. Мы свяжемся с вами',
+      failure: 'Что-то пошло нет так'
+   }
+
+   let form = document.getElementsByTagName('form'),
+      //input = form.getElementsByTagName('input'),
+      statusMessage = document.createElement('div');
+      statusMessage.classList.add('status');
+
+      for (let i = 0; i < form.length; i++) {
+         form[i].addEventListener('submit', sendForm);
+      }   
+   
+   function sendForm(event) {
+      
+      let input = this.getElementsByTagName('input');
+
+      event.preventDefault();
+      this.appendChild(statusMessage);
+
+      let request = new XMLHttpRequest();         
+      request.open('POST', 'server.php');
+      request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+      let formData = new FormData(this);
+      let obj = {};
+
+      formData.forEach(function(value, key){
+         obj[key] = value;
+      });
+
+      let json = JSON.stringify(obj);
+      request.send(json);
+
+      request.addEventListener('readystatechange', function() {
+         if (this.readyState < 4) {
+            statusMessage.innerHTML = message.loading;
+         } else if (this.readyState == 4 && this.status == 200) {
+            statusMessage.innerHTML = message.success;
+         } else statusMessage.innerHTML = message.failure;
+      });
+
+      for (let i = 0; i < input.length; i++) {
+         input[i].value = '';
+      }
+   };
 
 });
