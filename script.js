@@ -138,32 +138,53 @@ window.addEventListener('DOMContentLoaded', function() {
 
       event.preventDefault();
       this.appendChild(statusMessage);
-
-      let request = new XMLHttpRequest();         
-      request.open('POST', 'server.php');
-      request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-
       let formData = new FormData(this);
-      let obj = {};
 
-      formData.forEach(function(value, key){
-         obj[key] = value;
-      });
+      function postData(data) {
+         return new Promise(function(resolve, reject) {
 
-      let json = JSON.stringify(obj);
-      request.send(json);
+            let request = new XMLHttpRequest();         
+            request.open('POST', 'server.php');
+            request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
-      request.addEventListener('readystatechange', function() {
-         if (this.readyState < 4) {
-            statusMessage.innerHTML = message.loading;
-         } else if (this.readyState == 4 && this.status == 200) {
-            statusMessage.innerHTML = message.success;
-         } else statusMessage.innerHTML = message.failure;
-      });
+            request.addEventListener('readystatechange', function() {
+               if (this.readyState < 4) {
+                  //statusMessage.innerHTML = message.loading;
+                  resolve();
+               } else if (this.readyState == 4 && this.status == 200) {
+                  //statusMessage.innerHTML = message.success;
+                  resolve();
+               } else //statusMessage.innerHTML = message.failure;
+                  reject();
 
-      for (let i = 0; i < input.length; i++) {
+            });
+            
+            request.send(data);
+         }) //end promise
+
+         let obj = {};
+
+         formData.forEach(function(value, key){
+            obj[key] = value;
+         });
+
+         let json = JSON.stringify(obj);
+         request.send(json);  
+            
+      } //end postData    
+
+      postData(formData)
+         .then(() => statusMessage.innerHTML = message.loading)
+         .then(() => statusMessage.innerHTML = message.success)
+         .catch(() => statusMessage.innerHTML = message.failure)
+         .then(() => clearInput);     
+           
+      function clearInput() {
+         for (let i = 0; i < input.length; i++) {
          input[i].value = '';
-      }
+         }
+      };
+      
    };
 
 });
